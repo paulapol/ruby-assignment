@@ -1,5 +1,6 @@
 require_relative "../car_wash"
 require 'rspec'
+require 'byebug'
 
 include RSpec
 
@@ -48,7 +49,6 @@ describe Car_wash do
             car_wash.pickup_time(Time.now)
             expect(car_wash.pickup_time(Time.now)).to eq 'Monday 27-07-2020 10:00'
             allow(Time).to receive(:now).and_return(Time.new(2020,07,27,9,30))
-            car_wash=Car_wash.new
             expect(car_wash.pickup_time(Time.now)).to eq 'Monday 27-07-2020 12:00'
         end
     end
