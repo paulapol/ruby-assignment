@@ -1,12 +1,10 @@
-
 require 'ostruct'
-require 'byebug'
 
 class Car_wash 
 
 attr_accessor :enter_time, :reservation
 def initialize
-    @reservation = Array.new
+    @reservations = Array.new
     @enter_time = Time.now
 end
 
@@ -35,7 +33,7 @@ def schedule(enter_time)
 end
 
 def can_process_now?(enter_time)
-    if @reservation.empty? || @reservation.length() == 1 || [@reservation[-1].pickup_time, @reservation[-2].pickup_time].any? {|pickup_time| pickup_time <enter_time}
+    if @reservations.empty? || @reservations.length() == 1 || [@reservations[-1].pickup_time, @reservations[-2].pickup_time].any? { |pickup_time| pickup_time <enter_time }
         true
     else
         false
@@ -44,20 +42,20 @@ end
 
 def worker_availability(enter_time)
     pickup_time = process_request(enter_time)
-    if @reservation.empty? 
-        return { worker_id: 1, pickup_time: pickup_time}
+    if @reservations.empty? 
+        return { worker_id: 1, pickup_time: pickup_time }
     end
-    if @reservation.length() == 1
-        return {worker_id: 3 - @reservation[0].worker, pickup_time: pickup_time}
+    if @reservations.length() == 1
+        return { worker_id: 3 - @reservations[0].worker, pickup_time: pickup_time }
     end
-    if @reservation[-2].pickup_time < enter_time
-        return {worker_id: @reservation[-2].worker, pickup_time: pickup_time}
+    if @reservations[-2].pickup_time < enter_time
+        return { worker_id: @reservations[-2].worker, pickup_time: pickup_time }
     end
-    if @reservation[-1].pickup_time < enter_time
-        return {worker_id: @reservation[-1].worker, pickup_time: pickup_time}
+    if @reservations[-1].pickup_time < enter_time
+        return { worker_id: @reservations[-1].worker, pickup_time: pickup_time }
     end  
     
-    {worker_id: @reservation[-2].worker, pickup_time: pickup_time}
+    { worker_id: @reservations[-2].worker, pickup_time: pickup_time }
 end
 
 def pickup_time(enter_time)
@@ -66,12 +64,12 @@ def pickup_time(enter_time)
     if can_process_now?(enter_time)
         entry.enter_time = enter_time
     else
-        entry.enter_time = @reservation[-2].pickup_time
+        entry.enter_time = @reservations[-2].pickup_time
     end
     availability = worker_availability(entry.enter_time)
     entry.worker = availability[:worker_id]
     entry.pickup_time = Time.at(availability[:pickup_time])
-    @reservation.push(entry)
+    @reservations.push(entry)
 
     entry.pickup_time.strftime("%A %d-%m-%Y %H:%M")   
 end
@@ -91,9 +89,3 @@ def process_request(process_time)
 end
 
 end
-
-
-
-
-
-
